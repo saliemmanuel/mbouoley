@@ -24,6 +24,7 @@ class AuthProvider extends ChangeNotifier {
 
   initDataUtilisateur({required String? email}) async {
     _listUtilisateur = await service.getUserList(email: email);
+    print(_listUtilisateur);
     notifyListeners();
   }
 }

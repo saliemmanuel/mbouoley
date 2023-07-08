@@ -85,14 +85,13 @@ class _LoginState extends State<Login> {
                                                 onPressed: () {
                                                   showContactAdmin =
                                                       !showContactAdmin;
+                                                  forgetPass = false;
                                                   setState(() {});
                                                 }),
                                           ),
                                           const SizedBox(height: 15.0),
-                                          Image.asset(
-                                            "assets/logo.png",
-                                            width: 80.0,
-                                          ),
+                                          Image.asset("assets/logo.png",
+                                              width: 80.0),
                                           const SizedBox(height: 15.0),
                                           const Text(
                                             "Contacter un Administrateur",
@@ -140,18 +139,22 @@ class _LoginState extends State<Login> {
                                                           email: email.text
                                                               .trim());
                                                     }
+
+                                                    if (showContactAdmin) {
+                                                      service.contacterAdmin(
+                                                          email: email.text);
+                                                    }
                                                   } else {
                                                     showDialog<String>(
                                                       context: context,
                                                       builder: (context) =>
                                                           ContentDialog(
                                                         content: const Text(
-                                                          "Entrez un e-mail et un mot de passe svp!",
-                                                          style: TextStyle(
-                                                              fontSize: 25.0),
-                                                          textAlign:
-                                                              TextAlign.center,
-                                                        ),
+                                                            "Entrez un e-mail et un mot de passe svp!",
+                                                            style: TextStyle(
+                                                                fontSize: 25.0),
+                                                            textAlign: TextAlign
+                                                                .center),
                                                         actions: [
                                                           FilledButton(
                                                             child: const Text(
@@ -247,6 +250,7 @@ class _LoginState extends State<Login> {
                                                               .primaryColor)),
                                                   onPressed: () {
                                                     setState(() {
+                                                      password.clear();
                                                       forgetPass = !forgetPass;
                                                     });
                                                   },

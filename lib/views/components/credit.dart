@@ -34,7 +34,7 @@ class _CreditsState extends State<Credits> {
           ),
           child: value.listUtilisateur!.isEmpty
               ? const SizedBox(
-                  child: material.Center(child: Text("Chargement")))
+                  child: material.Center(child: Text("Chargement...")))
               : Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

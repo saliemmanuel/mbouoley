@@ -39,7 +39,7 @@ class _UsersViewsState extends State<UsersViews> {
             ],
           ),
           child: value.listUtilisateur!.isEmpty
-              ? const SizedBox(child: Text("dksl"))
+              ? const SizedBox(child: Center(child: Text("Chargement...")))
               : Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

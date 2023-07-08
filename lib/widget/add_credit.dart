@@ -1,4 +1,3 @@
-import 'package:crm_sahel_telecom/Models/utilisateur.dart';
 import 'package:crm_sahel_telecom/api/service_api.dart';
 import 'package:crm_sahel_telecom/config/palette.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -25,38 +24,25 @@ class _AddCreditState extends State<AddCredit> {
   DateTime? selected;
   bool checked = false;
   String? selectedTypeCredit;
+  String? selectedCatCredit;
   String? selectedLogement;
   String? selectedMatri;
   String? selectedGenre;
   String? selectedSecteurProf;
   String? selectedNiveau;
-  List<String> cats = [
+
+  List<String> typeCredit = [
     "Scolaire(SCO)",
     "Immobilier(IMM)",
     "Investissement(INV)",
-    "Affaire(AFF)",
+    "Autre"
   ];
+  List<String> catsCredit = ["Court terme", "Long terme", "Moyen terme"];
   List<String> logement = ["Locataire", "Propriété"];
-  List<String> matrimonial = [
-    "Marié",
-    "Célibataire",
-    "Veuf",
-  ];
-  List<String> genre = [
-    "Homme",
-    "Femme",
-  ];
-  List<String> profession = [
-    "Public",
-    "Privé",
-    "Pensionnaire",
-  ];
-  List<String> niveau = [
-    "Primaire",
-    "Sécondaire",
-    "Suppérieur",
-    "Rien",
-  ];
+  List<String> matrimonial = ["Marié", "Célibataire", "Veuf"];
+  List<String> genre = ["Homme", "Femme"];
+  List<String> profession = ["Public", "Privé", "Pensionnaire"];
+  List<String> niveau = ["Primaire", "Sécondaire", "Suppérieur", "Rien"];
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -180,8 +166,8 @@ class _AddCreditState extends State<AddCredit> {
                     value: selectedMatri,
                     items: matrimonial.map<ComboBoxItem<String>>((e) {
                       return ComboBoxItem<String>(
-                        child: Text(e),
                         value: e,
+                        child: Text(e),
                       );
                     }).toList(),
                     onChanged: (color) {
@@ -224,10 +210,10 @@ class _AddCreditState extends State<AddCredit> {
                 Expanded(
                   child: ComboBox<String>(
                     value: selectedTypeCredit,
-                    items: cats.map<ComboBoxItem<String>>((e) {
+                    items: typeCredit.map<ComboBoxItem<String>>((e) {
                       return ComboBoxItem<String>(
-                        child: Text(e),
                         value: e,
+                        child: Text(e),
                       );
                     }).toList(),
                     onChanged: (color) {
@@ -271,14 +257,50 @@ class _AddCreditState extends State<AddCredit> {
                   ),
                 ),
                 const SizedBox(width: 15.0),
-                Expanded(
-                  child: TextBox(
-                    controller: pseudo,
-                    highlightColor: Palette.secondColor,
-                    keyboardType: TextInputType.emailAddress,
-                    placeholder: "Type de prêt",
-                    expands: false,
-                  ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ComboBox<String>(
+                        value: selectedSecteurProf,
+                        items: profession.map<ComboBoxItem<String>>((e) {
+                          return ComboBoxItem<String>(
+                            value: e,
+                            child: Text(e),
+                          );
+                        }).toList(),
+                        onChanged: (color) {
+                          setState(() => selectedSecteurProf = color);
+                        },
+                        placeholder: const Text('Secteur profession'),
+                      ),
+                    ),
+                    const SizedBox(width: 15.0),
+                    Expanded(
+                      child: TextBox(
+                        controller: pseudo,
+                        highlightColor: Palette.secondColor,
+                        keyboardType: TextInputType.emailAddress,
+                        placeholder: 'Revenue mensuel',
+                        expands: false,
+                      ),
+                    ),
+                    const SizedBox(width: 15.0),
+                    Expanded(
+                      child: ComboBox<String>(
+                        value: selectedCatCredit,
+                        items: catsCredit.map<ComboBoxItem<String>>((e) {
+                          return ComboBoxItem<String>(
+                            value: e,
+                            child: Text(e),
+                          );
+                        }).toList(),
+                        onChanged: (color) {
+                          setState(() => selectedCatCredit = color);
+                        },
+                        placeholder: const Text('Cathégorie crédit'),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -396,7 +418,7 @@ class _AddCreditState extends State<AddCredit> {
                   ),
                   const SizedBox(width: 10.0),
                   FilledButton(
-                    child: const Text("Annalyser"),
+                    child: const Text("Analyser"),
                     onPressed: () {
                       if (pseudo.text.isEmpty ||
                           nom.text.isEmpty ||

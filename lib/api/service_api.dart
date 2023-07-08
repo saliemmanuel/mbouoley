@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:crm_sahel_telecom/provider/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -12,6 +14,7 @@ import 'host.dart';
 class ServiceApi {
   final supabase = Supabase.instance.client;
   var host = Host();
+
   bool isEmail(String email) {
     String p =
         r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
@@ -27,8 +30,10 @@ class ServiceApi {
             .changeValConnexionIsLoading(false);
       } else {
         var response = await supabase.auth
-            .signInWithPassword(email: email, password: password!);
-        // alertDialogue(context, content: "E-mail incorrect");
+            .signInWithPassword(email: email, password: password!)
+            .timeout(const Duration(seconds: 10), onTimeout: () {
+          throw TimeoutException("Time out");
+        });
         provider.Provider.of<AuthProvider>(context, listen: false)
             .changeValConnexionIsLoading(true);
         if (response.user != null) {
@@ -37,19 +42,22 @@ class ServiceApi {
             pushNewPageRemoveUntil(
                 Home(
                     user: Utilisateur(
-                  id: data[0]['id'].toString(),
-                  nom: data[0]['nom'],
-                  prenom: data[0]['prenom'],
-                  email: data[0]['email'],
-                  pseudo: data[0]['pseudo'],
-                  statut: data[0]['statut'],
-                  grade: data[0]['grade'],
-                )),
+                        id: data[0]['id'].toString(),
+                        nom: data[0]['nom'],
+                        prenom: data[0]['prenom'],
+                        email: data[0]['email'],
+                        pseudo: data[0]['pseudo'],
+                        statut: data[0]['statut'],
+                        grade: data[0]['grade'])),
                 context);
           }
         }
       }
     } on AuthException catch (e) {
+      provider.Provider.of<AuthProvider>(context, listen: false)
+          .changeValConnexionIsLoading(false);
+      alertDialogue(context, content: e.message);
+    } on TimeoutException catch (e) {
       provider.Provider.of<AuthProvider>(context, listen: false)
           .changeValConnexionIsLoading(false);
       alertDialogue(context, content: e.message);
@@ -66,12 +74,29 @@ class ServiceApi {
 
   forgetPass({String? email, var context}) async {
     try {
-      await supabase.auth.resetPasswordForEmail(email!);
-      // alertDialogue(context, title: "Erreur", content: response.toString());
-      provider.Provider.of<AuthProvider>(context, listen: false)
-          .changeValConnexionIsLoading(true);
-      // pushNewPageRemoveUntil(const Home(), context);
+      if (isEmail(email!)) {
+        provider.Provider.of<AuthProvider>(context, listen: false)
+            .changeValConnexionIsLoading(true);
+        await supabase.auth.resetPasswordForEmail(email).whenComplete(() {
+          provider.Provider.of<AuthProvider>(context, listen: false)
+              .changeValConnexionIsLoading(false);
+          alertDialogue(context,
+              content: "Un lien de vérification vous a été envoyer par email");
+        }).timeout(const Duration(seconds: 10), onTimeout: () {
+          throw TimeoutException("Time out");
+        });
+        provider.Provider.of<AuthProvider>(context, listen: false)
+            .changeValConnexionIsLoading(true);
+      } else {
+        alertDialogue(context, content: "Entrez une e-mail valide");
+        provider.Provider.of<AuthProvider>(context, listen: false)
+            .changeValConnexionIsLoading(false);
+      }
     } on AuthException catch (e) {
+      provider.Provider.of<AuthProvider>(context, listen: false)
+          .changeValConnexionIsLoading(false);
+      alertDialogue(context, content: e.message);
+    } on TimeoutException catch (e) {
       provider.Provider.of<AuthProvider>(context, listen: false)
           .changeValConnexionIsLoading(false);
       alertDialogue(context, content: e.message);
@@ -84,11 +109,20 @@ class ServiceApi {
   verifyOTP({String? token, email, OtpType? otpType, var context}) async {
     try {
       await supabase.auth
-          .verifyOTP(email: email!, token: token!, type: otpType!);
+          .verifyOTP(email: email!, token: token!, type: otpType!)
+          .timeout(const Duration(seconds: 10), onTimeout: () {
+        throw TimeoutException("Time out");
+      });
       // pushNewPageRemoveUntil(const Home(), context);
     } on AuthException catch (e) {
       alertDialogue(context, content: e.message);
-    } catch (e) {}
+    } on TimeoutException catch (e) {
+      provider.Provider.of<AuthProvider>(context, listen: false)
+          .changeValConnexionIsLoading(false);
+      alertDialogue(context, content: e.message);
+    } catch (e) {
+      alertDialogue(context, content: e.toString());
+    }
   }
 
   deconnexion({var context}) async {
@@ -99,7 +133,9 @@ class ServiceApi {
           .changeValConnexionIsLoading(false);
     } on AuthException catch (e) {
       alertDialogue(context, content: e.message);
-    } catch (e) {}
+    } catch (e) {
+      alertDialogue(context, content: e.toString());
+    }
   }
 
   addUser(
@@ -107,9 +143,15 @@ class ServiceApi {
       Utilisateur? utilisateur,
       required String? emailAdmin}) async {
     try {
+      provider.Provider.of<AuthProvider>(context!, listen: false)
+          .initDataUtilisateur(email: emailAdmin);
+      Navigator.pop(context);
       await supabase.auth
           .signUp(email: utilisateur!.email, password: utilisateur.email!)
           .whenComplete(() async {
+        alertDialogue(context,
+            content:
+                "Compte utilisateur crée avec succès,\nUn message de confirmation à été envoyer à l'email ${utilisateur.email}");
         await supabase.from("utilisateur").insert({
           "nom": utilisateur.nom,
           "prenom": utilisateur.prenom,
@@ -118,14 +160,14 @@ class ServiceApi {
           "pseudo": utilisateur.pseudo,
           "grade": utilisateur.grade
         });
-        alertDialogue(context,
-            content:
-                "Compte utilisateur crée avec succès,\nUn message de confirmation à été envoyer à l'email ${utilisateur.email}");
-        provider.Provider.of<AuthProvider>(context!, listen: false)
-            .initDataUtilisateur(email: emailAdmin);
-        Navigator.pop(context);
+      }).timeout(const Duration(seconds: 10), onTimeout: () {
+        throw TimeoutException("Time out");
       });
     } on AuthException catch (e) {
+      provider.Provider.of<AuthProvider>(context!, listen: false)
+          .changeValConnexionIsLoading(false);
+      alertDialogue(context, content: e.message);
+    } on TimeoutException catch (e) {
       provider.Provider.of<AuthProvider>(context!, listen: false)
           .changeValConnexionIsLoading(false);
       alertDialogue(context, content: e.message);
@@ -146,5 +188,11 @@ class ServiceApi {
     return await supabase
         .from('utilisateur')
         .update({'statut': statut}).match({'id': id});
+  }
+
+  contacterAdmin({required String? email, BuildContext? context}) async {
+    await supabase.from("utilisateur").insert({"email": email}).whenComplete(
+        () => alertDialogue(context,
+            content: "Votre e-mail a été soumit avec succès! "));
   }
 }

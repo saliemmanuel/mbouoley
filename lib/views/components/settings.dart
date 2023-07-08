@@ -34,7 +34,7 @@ class _SettingsState extends State<Settings> {
                     offset: Offset(1, 0))
               ],
             ),
-            child: Text("dsd"));
+            child: const Text("Chargement"));
       },
     );
   }
