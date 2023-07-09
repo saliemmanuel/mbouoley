@@ -1,15 +1,18 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:crm_sahel_telecom/provider/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:provider/provider.dart' as provider;
+import '../Models/credits.dart';
 import '../Models/utilisateur.dart';
 import '../views/home.dart';
 import '../views/login.dart';
 import '../widget/dialogue.dart';
 import '../widget/route.dart';
 import 'host.dart';
+import 'package:http/http.dart' as http;
 
 class ServiceApi {
   final supabase = Supabase.instance.client;
@@ -194,5 +197,45 @@ class ServiceApi {
     await supabase.from("utilisateur").insert({"email": email}).whenComplete(
         () => alertDialogue(context,
             content: "Votre e-mail a été soumit avec succès! "));
+  }
+
+  storeModelPrediction({required Credits credits, var contexte}) async {
+    simpleDialogueCardSansTitle(
+        barrierDismissible: true, context: contexte, msg: "Analyse en cours");
+    try {
+      var data = await http.post(host.baseUrl(endpoint: "models/"), body: {
+        "interestRate": credits.interestRate,
+        "loanTerm": credits.loanTerm,
+        "age": credits.age,
+        "loanAmount": credits.loanAmount,
+        "sexe": credits.sexe,
+        "revenu": credits.revenu,
+        "loanNbr": credits.loanNbr,
+        "logement": credits.logement,
+        "npaCharge": credits.npaCharge,
+        "activiteSecondaire": credits.activiteSecondaire,
+      }).timeout(const Duration(seconds: 10), onTimeout: () {
+        throw TimeoutException("Time out");
+      });
+      var response = await jsonDecode(data.body);
+
+      print(response);
+
+      if (data.statusCode == 200) {
+        Navigator.pop(contexte);
+        var response = await jsonDecode(data.body);
+        credits.predictioSet(response['prediction'][0].toString());
+        print(credits);
+        // await supabase.from("utilisateur").insert(credits.toMap());
+      }
+    } on TimeoutException catch (e) {
+      Navigator.pop(contexte);
+      alertDialogue(contexte, content: e.message);
+    } catch (e) {
+      print(e);
+      Navigator.pop(contexte);
+      alertDialogue(contexte,
+          content: "C'est très domage le serveur distant ne reponds pas");
+    }
   }
 }
