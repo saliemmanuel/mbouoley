@@ -6,9 +6,11 @@ import 'package:lottie/lottie.dart';
 
 import '../Models/credits.dart';
 import 'dialogue.dart';
+import 'package:crm_sahel_telecom/Models/utilisateur.dart';
 
 class AddCredit extends StatefulWidget {
-  const AddCredit({super.key});
+  final Utilisateur user;
+  const AddCredit({super.key, required this.user});
 
   @override
   State<AddCredit> createState() => _AddCreditState();
@@ -460,6 +462,7 @@ class _AddCreditState extends State<AddCredit> {
                           print("Tous Ok");
                           service.storeModelPrediction(
                               credits: Credits(
+                                auteur: "${widget.user.nom}${widget.user.nom}",
                                 nomcompte: numcompte.text,
                                 codeagence: codeagence.text,
                                 nomprenom: nomprenom.text,

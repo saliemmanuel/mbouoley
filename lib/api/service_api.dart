@@ -226,7 +226,7 @@ class ServiceApi {
         var response = await jsonDecode(data.body);
         credits.predictioSet(response['prediction'][0].toString());
         print(credits);
-        // await supabase.from("utilisateur").insert(credits.toMap());
+        await supabase.from("utilisateur").insert(credits.toMap());
       }
     } on TimeoutException catch (e) {
       Navigator.pop(contexte);

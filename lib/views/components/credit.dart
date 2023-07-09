@@ -6,9 +6,12 @@ import '../../config/palette.dart';
 import '../../provider/auth_provider.dart';
 import '../../widget/add_credit.dart';
 import '../../widget/route.dart';
+import 'package:crm_sahel_telecom/Models/utilisateur.dart';
 
 class Credits extends StatefulWidget {
-  const Credits({super.key});
+  final Utilisateur user;
+
+  const Credits({super.key, required this.user});
 
   @override
   State<Credits> createState() => _CreditsState();

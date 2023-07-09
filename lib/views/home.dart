@@ -27,7 +27,7 @@ class _HomeState extends State<Home> {
     final content = [
       const DashBoard(),
       UsersViews(user: widget.user),
-      const Credits(),
+      Credits(user: widget.user),
       const Settings(),
     ];
 
