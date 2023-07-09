@@ -4,6 +4,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:lottie/lottie.dart';
 
+import '../Models/credits.dart';
 import 'dialogue.dart';
 
 class AddCredit extends StatefulWidget {
@@ -14,15 +15,24 @@ class AddCredit extends StatefulWidget {
 }
 
 class _AddCreditState extends State<AddCredit> {
-  bool showWarning = true;
   bool showSpine = false;
-  var pseudo = TextEditingController();
-  var nom = TextEditingController();
-  var prenom = TextEditingController();
-  var email = TextEditingController();
+  var numcompte = TextEditingController();
+  var codeagence = TextEditingController();
+  var nomprenom = TextEditingController();
+  var age = TextEditingController();
+  var lieu = TextEditingController();
+  var revenu = TextEditingController();
+  var montantcollicite = TextEditingController();
+  var taux = TextEditingController();
+  var duree = TextEditingController();
+  var quotite = TextEditingController();
+  var nombreenfcharge = TextEditingController();
+  var creditcontract = TextEditingController();
   var service = ServiceApi();
-  DateTime? selected;
-  bool checked = false;
+  int haveSecondActi = 3;
+  int isEmployeeSahel = 3;
+  var radioButtons = <String>['Oui', 'Non'];
+  var radioButtonsZ = <String>['Oui', 'Non'];
   String? selectedTypeCredit;
   String? selectedCatCredit;
   String? selectedLogement;
@@ -46,7 +56,7 @@ class _AddCreditState extends State<AddCredit> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 550.0,
+      height: 620.0,
       width: 980.0,
       alignment: Alignment.center,
       color: Palette.ligthBg,
@@ -73,7 +83,7 @@ class _AddCreditState extends State<AddCredit> {
               children: [
                 Expanded(
                   child: TextBox(
-                    controller: pseudo,
+                    controller: numcompte,
                     highlightColor: Palette.secondColor,
                     keyboardType: TextInputType.emailAddress,
                     placeholder: 'N° compte',
@@ -83,7 +93,7 @@ class _AddCreditState extends State<AddCredit> {
                 const SizedBox(width: 15.0),
                 Expanded(
                   child: TextBox(
-                    controller: pseudo,
+                    controller: codeagence,
                     highlightColor: Palette.secondColor,
                     keyboardType: TextInputType.emailAddress,
                     placeholder: 'Code agence',
@@ -97,7 +107,7 @@ class _AddCreditState extends State<AddCredit> {
               children: [
                 Expanded(
                   child: TextBox(
-                    controller: pseudo,
+                    controller: nomprenom,
                     highlightColor: Palette.secondColor,
                     keyboardType: TextInputType.emailAddress,
                     placeholder: 'Nom et prénom',
@@ -107,17 +117,17 @@ class _AddCreditState extends State<AddCredit> {
                 const SizedBox(width: 15.0),
                 Expanded(
                   child: TextBox(
-                    controller: pseudo,
+                    controller: age,
                     highlightColor: Palette.secondColor,
                     keyboardType: TextInputType.emailAddress,
-                    placeholder: 'Année de naissance',
+                    placeholder: 'Age',
                     expands: false,
                   ),
                 ),
                 const SizedBox(width: 15.0),
                 Expanded(
                   child: TextBox(
-                    controller: pseudo,
+                    controller: lieu,
                     highlightColor: Palette.secondColor,
                     keyboardType: TextInputType.emailAddress,
                     placeholder: 'Lieu de naissance',
@@ -199,7 +209,7 @@ class _AddCreditState extends State<AddCredit> {
                 const SizedBox(width: 15.0),
                 Expanded(
                   child: TextBox(
-                    controller: pseudo,
+                    controller: revenu,
                     highlightColor: Palette.secondColor,
                     keyboardType: TextInputType.emailAddress,
                     placeholder: 'Revenue mensuel',
@@ -229,7 +239,7 @@ class _AddCreditState extends State<AddCredit> {
               children: [
                 Expanded(
                   child: TextBox(
-                    controller: pseudo,
+                    controller: montantcollicite,
                     highlightColor: Palette.secondColor,
                     keyboardType: TextInputType.emailAddress,
                     placeholder: 'Montant sollicité',
@@ -239,7 +249,7 @@ class _AddCreditState extends State<AddCredit> {
                 const SizedBox(width: 15.0),
                 Expanded(
                   child: TextBox(
-                    controller: pseudo,
+                    controller: taux,
                     highlightColor: Palette.secondColor,
                     keyboardType: TextInputType.emailAddress,
                     placeholder: "Taux d'intérêt",
@@ -249,58 +259,42 @@ class _AddCreditState extends State<AddCredit> {
                 const SizedBox(width: 15.0),
                 Expanded(
                   child: TextBox(
-                    controller: pseudo,
+                    controller: duree,
                     highlightColor: Palette.secondColor,
                     keyboardType: TextInputType.emailAddress,
                     placeholder: "Durée du prêt",
                     expands: false,
                   ),
                 ),
+              ],
+            ),
+            const SizedBox(height: 15.0),
+            Row(
+              children: [
+                Expanded(
+                  child: ComboBox<String>(
+                    value: selectedCatCredit,
+                    items: catsCredit.map<ComboBoxItem<String>>((e) {
+                      return ComboBoxItem<String>(
+                        value: e,
+                        child: Text(e),
+                      );
+                    }).toList(),
+                    onChanged: (color) {
+                      setState(() => selectedCatCredit = color);
+                    },
+                    placeholder: const Text('Cathégorie crédit'),
+                  ),
+                ),
                 const SizedBox(width: 15.0),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ComboBox<String>(
-                        value: selectedSecteurProf,
-                        items: profession.map<ComboBoxItem<String>>((e) {
-                          return ComboBoxItem<String>(
-                            value: e,
-                            child: Text(e),
-                          );
-                        }).toList(),
-                        onChanged: (color) {
-                          setState(() => selectedSecteurProf = color);
-                        },
-                        placeholder: const Text('Secteur profession'),
-                      ),
-                    ),
-                    const SizedBox(width: 15.0),
-                    Expanded(
-                      child: TextBox(
-                        controller: pseudo,
-                        highlightColor: Palette.secondColor,
-                        keyboardType: TextInputType.emailAddress,
-                        placeholder: 'Revenue mensuel',
-                        expands: false,
-                      ),
-                    ),
-                    const SizedBox(width: 15.0),
-                    Expanded(
-                      child: ComboBox<String>(
-                        value: selectedCatCredit,
-                        items: catsCredit.map<ComboBoxItem<String>>((e) {
-                          return ComboBoxItem<String>(
-                            value: e,
-                            child: Text(e),
-                          );
-                        }).toList(),
-                        onChanged: (color) {
-                          setState(() => selectedCatCredit = color);
-                        },
-                        placeholder: const Text('Cathégorie crédit'),
-                      ),
-                    ),
-                  ],
+                Expanded(
+                  child: TextBox(
+                    controller: quotite,
+                    highlightColor: Palette.secondColor,
+                    keyboardType: TextInputType.emailAddress,
+                    placeholder: "Quotité",
+                    expands: false,
+                  ),
                 ),
               ],
             ),
@@ -325,7 +319,7 @@ class _AddCreditState extends State<AddCredit> {
                 const SizedBox(width: 15.0),
                 Expanded(
                   child: TextBox(
-                    controller: pseudo,
+                    controller: nombreenfcharge,
                     highlightColor: Palette.secondColor,
                     keyboardType: TextInputType.emailAddress,
                     placeholder: "Nombre d'enfant en charge",
@@ -335,69 +329,57 @@ class _AddCreditState extends State<AddCredit> {
                 const SizedBox(width: 15.0),
                 Expanded(
                   child: TextBox(
-                    controller: pseudo,
+                    controller: creditcontract,
                     highlightColor: Palette.secondColor,
                     keyboardType: TextInputType.emailAddress,
                     placeholder: "Nombre de crédit déjà contracté",
                     expands: false,
                   ),
                 ),
-                const SizedBox(width: 15.0),
-                Expanded(
-                  child: TextBox(
-                    controller: pseudo,
-                    highlightColor: Palette.secondColor,
-                    keyboardType: TextInputType.emailAddress,
-                    placeholder: "Quotité",
-                    expands: false,
-                  ),
-                ),
               ],
             ),
             const SizedBox(height: 25.0),
-            Row(
+            Wrap(
               children: [
                 Row(
                   children: [
                     const Text("Est un employer du Crédit du Sahel ?"),
                     const SizedBox(width: 15.0),
-                    Checkbox(
-                      content: const Text("Oui"),
-                      checked: checked,
-                      onChanged: (bool? value) {
-                        setState(() => checked = value!);
-                      },
-                    ),
-                    const SizedBox(width: 20.0),
-                    Checkbox(
-                      content: const Text("Non"),
-                      checked: checked,
-                      onChanged: (bool? value) {
-                        setState(() => checked = value!);
-                      },
-                    ),
-                    const SizedBox(width: 70.0),
-                    Row(
-                      children: [
-                        const Text("A une activité secondaire ?"),
-                        const SizedBox(width: 10.0),
-                        Checkbox(
-                          content: const Text("Oui"),
-                          checked: checked,
-                          onChanged: (bool? value) {
-                            setState(() => checked = value!);
+                    ...List.generate(radioButtonsZ.length, (vindex) {
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: RadioButton(
+                          checked: isEmployeeSahel == vindex,
+                          onChanged: (value) {
+                            setState(() {
+                              isEmployeeSahel = vindex;
+                            });
                           },
+                          content: Text(radioButtons[vindex]),
                         ),
-                        const SizedBox(width: 20.0),
-                        Checkbox(
-                          content: const Text("Non"),
-                          checked: checked,
-                          onChanged: (bool? value) {
-                            setState(() => checked = value!);
+                      );
+                    })
+                  ],
+                ),
+                const SizedBox(width: 70.0),
+                Row(
+                  children: [
+                    const Text("A une activité secondaire ?"),
+                    const SizedBox(width: 10.0),
+                    ...List.generate(radioButtons.length, (index) {
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: RadioButton(
+                          checked: haveSecondActi == index,
+                          onChanged: (value) {
+                            setState(() {
+                              haveSecondActi = index;
+                            });
                           },
+                          content: Text(radioButtons[index]),
                         ),
-                      ],
-                    ),
+                      );
+                    })
                   ],
                 ),
               ],
@@ -420,28 +402,91 @@ class _AddCreditState extends State<AddCredit> {
                   FilledButton(
                     child: const Text("Analyser"),
                     onPressed: () {
-                      if (pseudo.text.isEmpty ||
-                          nom.text.isEmpty ||
-                          prenom.text.isEmpty ||
-                          email.text.isEmpty) {
+                      if (numcompte.text.isEmpty ||
+                          codeagence.text.isEmpty ||
+                          nomprenom.text.isEmpty ||
+                          age.text.isEmpty ||
+                          lieu.text.isEmpty ||
+                          revenu.text.isEmpty ||
+                          montantcollicite.text.isEmpty ||
+                          taux.text.isEmpty ||
+                          duree.text.isEmpty ||
+                          quotite.text.isEmpty ||
+                          nombreenfcharge.text.isEmpty ||
+                          creditcontract.text.isEmpty ||
+                          selectedTypeCredit == null ||
+                          selectedCatCredit == null ||
+                          selectedLogement == null ||
+                          selectedMatri == null ||
+                          selectedGenre == null ||
+                          selectedSecteurProf == null ||
+                          selectedNiveau == null) {
                         alertDialogue(context,
                             content: "Remplissez tous les champs svp!");
                       } else {
-                        if (service.isEmail(email.text)) {
-                          setState(() {
-                            showSpine = !showSpine;
-                          });
-                          // service.addUser(
-                          //     context: context,
-                          //     utilisateur: Utilisateur(
-                          //         email: email.text,
-                          //         nom: nom.text,
-                          //         prenom: prenom.text,
-                          //         pseudo: pseudo.text,
-                          //         grade: ,
-                          //         statut: true));
+                        if (int.tryParse(age.text) == null) {
+                          alertDialogue(context,
+                              content: "Le champ année doit être un entier");
+                        } else if (double.tryParse(revenu.text) == null) {
+                          alertDialogue(context,
+                              content: "Le champ revenu doit être un réel");
+                        } else if (double.tryParse(montantcollicite.text) ==
+                            null) {
+                          alertDialogue(context,
+                              content:
+                                  "Le champ montant sollicite doit être un réel");
+                        } else if (double.tryParse(taux.text) == null) {
+                          alertDialogue(context,
+                              content:
+                                  "Le champ montant taux doit être un réel");
+                        } else if (double.tryParse(duree.text) == null) {
+                          alertDialogue(context,
+                              content: "Le champ duree doit être un entier");
+                        } else if (int.tryParse(nombreenfcharge.text) == null) {
+                          alertDialogue(context,
+                              content: "Le champ duree doit être un entier");
+                        } else if (int.tryParse(creditcontract.text) == null) {
+                          alertDialogue(context,
+                              content: "Le champ duree doit être un entier");
+                        } else if (isEmployeeSahel == 3) {
+                          alertDialogue(context,
+                              content:
+                                  "Vous n'avez pas repondu à la question :\nEst un employer du Crédit du Sahel ?");
+                        } else if (haveSecondActi == 3) {
+                          alertDialogue(context,
+                              content:
+                                  "Vous n'avez pas repondu à la question :\nA une activité secondaire ?");
                         } else {
-                          alertDialogue(context, content: "E-mail invalide");
+                          print("Tous Ok");
+                          service.storeModelPrediction(
+                              credits: Credits(
+                                nomcompte: numcompte.text,
+                                codeagence: codeagence.text,
+                                nomprenom: nomprenom.text,
+                                age: age.text,
+                                lieu: lieu.text,
+                                revenu: revenu.text,
+                                loanAmount: montantcollicite.text,
+                                taux: taux.text,
+                                loanTerm: duree.text,
+                                quotite: quotite.text,
+                                npaCharge: nombreenfcharge.text,
+                                loanNbr: creditcontract.text,
+                                activiteSecondaire:
+                                    haveSecondActi == 0 ? "Oui" : "Non",
+                                isEmployeeSahel:
+                                    isEmployeeSahel == 0 ? "Oui" : "Non",
+                                typecredit: selectedTypeCredit!,
+                                catcredit: selectedCatCredit!,
+                                logement: selectedLogement!,
+                                situationmatri: selectedMatri!,
+                                sexe: selectedGenre!,
+                                secteurprof: selectedSecteurProf!,
+                                niveauetude: selectedNiveau!,
+                                interestRate: taux.text,
+                                prediction: "",
+                              ),
+                              contexte: context);
                         }
                       }
                     },
@@ -460,7 +505,8 @@ class _AddCreditState extends State<AddCredit> {
                           width: 95.0),
                     )
                   ],
-                ))
+                )),
+            const SizedBox(height: 15.0),
           ],
         ),
       ),
