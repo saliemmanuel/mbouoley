@@ -10,6 +10,7 @@ import '../Models/utilisateur.dart';
 import '../views/home.dart';
 import '../views/login.dart';
 import '../widget/dialogue.dart';
+import '../widget/display_prediction.dart';
 import '../widget/route.dart';
 import 'host.dart';
 import 'package:http/http.dart' as http;
@@ -217,25 +218,34 @@ class ServiceApi {
       }).timeout(const Duration(seconds: 10), onTimeout: () {
         throw TimeoutException("Time out");
       });
-      var response = await jsonDecode(data.body);
-
-      print(response);
-
       if (data.statusCode == 200) {
         Navigator.pop(contexte);
         var response = await jsonDecode(data.body);
         credits.predictioSet(response['prediction'][0].toString());
-        print(credits);
-        await supabase.from("utilisateur").insert(credits.toMap());
+        await supabase.from("credit").insert(credits.toMap()).then((value) {
+          Navigator.pop(contexte);
+          actionDialogue(
+            context: contexte,
+            child: DisplayPrediction(credits: credits),
+          );
+          provider.Provider.of<AuthProvider>(contexte, listen: false)
+              .initDataCredit();
+        });
       }
     } on TimeoutException catch (e) {
       Navigator.pop(contexte);
       alertDialogue(contexte, content: e.message);
     } catch (e) {
-      print(e);
       Navigator.pop(contexte);
       alertDialogue(contexte,
           content: "C'est très domage le serveur distant ne reponds pas");
     }
+  }
+
+  getCreditList() async {
+    return await supabase
+        .from("credit")
+        .select("*")
+        .order('id', ascending: true);
   }
 }

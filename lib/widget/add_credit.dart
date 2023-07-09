@@ -324,7 +324,7 @@ class _AddCreditState extends State<AddCredit> {
                     controller: nombreenfcharge,
                     highlightColor: Palette.secondColor,
                     keyboardType: TextInputType.emailAddress,
-                    placeholder: "Nombre d'enfant en charge",
+                    placeholder: "Nombre de personnes en charge",
                     expands: false,
                   ),
                 ),
@@ -404,6 +404,8 @@ class _AddCreditState extends State<AddCredit> {
                   FilledButton(
                     child: const Text("Analyser"),
                     onPressed: () {
+                      showSpine = true;
+                      setState(() {});
                       if (numcompte.text.isEmpty ||
                           codeagence.text.isEmpty ||
                           nomprenom.text.isEmpty ||
@@ -459,7 +461,6 @@ class _AddCreditState extends State<AddCredit> {
                               content:
                                   "Vous n'avez pas repondu à la question :\nA une activité secondaire ?");
                         } else {
-                          print("Tous Ok");
                           service.storeModelPrediction(
                               credits: Credits(
                                 auteur: "${widget.user.nom}${widget.user.nom}",

@@ -6,10 +6,12 @@ class AuthProvider extends ChangeNotifier {
   bool _connexionIsLoading = false;
   int? _topIndex = 0;
   List _listUtilisateur = [];
+  List _listCredit = [];
   var service = ServiceApi();
 
   bool? get connexionIsLoading => _connexionIsLoading;
   List? get listUtilisateur => _listUtilisateur;
+  List? get listCredit => _listCredit;
   int? get topIndex => _topIndex;
 
   changeValConnexionIsLoading(bool val) {
@@ -24,7 +26,12 @@ class AuthProvider extends ChangeNotifier {
 
   initDataUtilisateur({required String? email}) async {
     _listUtilisateur = await service.getUserList(email: email);
-    print(_listUtilisateur);
+    notifyListeners();
+  }
+
+  initDataCredit() async {
+    _listCredit = await service.getCreditList();
+    print(_listCredit);
     notifyListeners();
   }
 }
