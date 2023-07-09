@@ -1,4 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/material.dart' as ma;
+
+import '../config/palette.dart';
 
 alertDialogue(var context, {String? content}) {
   return showDialog<String>(
@@ -14,4 +17,22 @@ alertDialogue(var context, {String? content}) {
       ],
     ),
   );
+}
+
+Future simpleDialogueCardSansTitle(
+    {String? msg, BuildContext? context, bool? barrierDismissible = false}) {
+  return showDialog(
+      context: context!,
+      barrierDismissible: barrierDismissible!,
+      builder: (BuildContext context) {
+        return ContentDialog(
+          content: Row(
+            children: [
+              const ma.CircularProgressIndicator(color: Palette.primaryColor),
+              const SizedBox(width: 15.0),
+              Text(msg!)
+            ],
+          ),
+        );
+      });
 }
