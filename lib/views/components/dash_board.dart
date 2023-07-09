@@ -27,10 +27,10 @@ class _DashBoardState extends State<DashBoard> {
         ],
       ),
       alignment: Alignment.center,
-      child: const Text(
-        "Bienvenue sur MBOUOLEY ",
-        style: TextStyle(fontSize: 55.0),
-      ),
+      // child: const Text(
+      //   "Bienvenue sur MBOUOLEY ",
+      //   style: TextStyle(fontSize: 55.0),
+      // ),
     );
   }
 }
