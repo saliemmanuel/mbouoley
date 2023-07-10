@@ -9,7 +9,7 @@ class Utilisateur {
   final String? grade;
   final bool? statut;
   Utilisateur({
-    this.id,
+    this.id = "",
     this.pseudo,
     this.nom,
     this.prenom,

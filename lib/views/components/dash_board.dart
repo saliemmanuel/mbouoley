@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../Models/utilisateur.dart';
+import '../../provider/auth_provider.dart';
 
 class DashBoard extends StatefulWidget {
-  const DashBoard({super.key});
+  final Utilisateur user;
+
+  const DashBoard({super.key, required this.user});
 
   @override
   State<DashBoard> createState() => _DashBoardState();
@@ -10,6 +16,10 @@ class DashBoard extends StatefulWidget {
 class _DashBoardState extends State<DashBoard> {
   @override
   Widget build(BuildContext context) {
+    Provider.of<AuthProvider>(context, listen: false).initDataCredit();
+
+    Provider.of<AuthProvider>(context, listen: false)
+        .initDataUtilisateur(email: widget.user.email);
     return Container(
       width: double.maxFinite,
       margin:

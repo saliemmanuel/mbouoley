@@ -4,7 +4,7 @@ import 'package:flutter/material.dart' as ma;
 import '../config/palette.dart';
 
 alertDialogue(var context, {String? content}) {
-  return showDialog<String>(
+  return showDialog(
     context: context,
     builder: (context) => ContentDialog(
       content: Text(content!,

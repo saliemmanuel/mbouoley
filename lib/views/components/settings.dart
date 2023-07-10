@@ -1,14 +1,14 @@
 import 'package:provider/provider.dart';
-import 'package:flutter/material.dart' as material;
 import 'package:fluent_ui/fluent_ui.dart';
 
+import '../../Models/utilisateur.dart';
 import '../../config/palette.dart';
 import '../../provider/auth_provider.dart';
-import '../../widget/add_utilisateur.dart';
-import '../../widget/route.dart';
 
 class Settings extends StatefulWidget {
-  const Settings({super.key});
+  final Utilisateur user;
+
+  const Settings({super.key, required this.user});
 
   @override
   State<Settings> createState() => _SettingsState();
@@ -34,7 +34,41 @@ class _SettingsState extends State<Settings> {
                     offset: Offset(1, 0))
               ],
             ),
-            child: const Text("Chargement"));
+            child: Padding(
+              padding: const EdgeInsets.all(50.0),
+              child: Column(
+                children: [
+                  Card(
+                    child: ListTile(
+                      leading: const Icon(FluentIcons.user_window),
+                      title: Text(
+                          'Nom et prenom : ${widget.user.nom} ${widget.user.nom}'),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Card(
+                    child: ListTile(
+                      leading: const Icon(FluentIcons.user_window),
+                      title: Text('Pseudo : ${widget.user.pseudo}'),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Card(
+                    child: ListTile(
+                      leading: const Icon(FluentIcons.user_window),
+                      title: Text('E-mail : ${widget.user.email}'),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Card(
+                    child: ListTile(
+                      leading: const Icon(FluentIcons.user_window),
+                      title: Text('Grade : ${widget.user.grade}'),
+                    ),
+                  )
+                ],
+              ),
+            ));
       },
     );
   }

@@ -31,7 +31,38 @@ class AuthProvider extends ChangeNotifier {
 
   initDataCredit() async {
     _listCredit = await service.getCreditList();
-    print(_listCredit);
+    notifyListeners();
+  }
+
+  searchInListUtilisateur(String query, var keys) {
+    dynamic results = [];
+    if (query.isEmpty) {
+      results = _listUtilisateur;
+    } else {
+      results = _listUtilisateur
+          .where((element) => element[keys]
+              .toString()
+              .toLowerCase()
+              .contains(query.toLowerCase()))
+          .toList();
+    }
+    _listUtilisateur = results;
+    notifyListeners();
+  }
+
+  searchInListCredits(String query, var keys) {
+    dynamic results = [];
+    if (query.isEmpty) {
+      results = _listCredit;
+    } else {
+      results = _listCredit
+          .where((element) => element[keys]
+              .toString()
+              .toLowerCase()
+              .contains(query.toLowerCase()))
+          .toList();
+    }
+    _listCredit = results;
     notifyListeners();
   }
 }

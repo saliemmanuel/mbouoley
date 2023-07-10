@@ -43,17 +43,30 @@ class ServiceApi {
         if (response.user != null) {
           List data = await getUserData(email: response.user!.email);
           if (data.isNotEmpty) {
-            pushNewPageRemoveUntil(
-                Home(
-                    user: Utilisateur(
-                        id: data[0]['id'].toString(),
-                        nom: data[0]['nom'],
-                        prenom: data[0]['prenom'],
-                        email: data[0]['email'],
-                        pseudo: data[0]['pseudo'],
-                        statut: data[0]['statut'],
-                        grade: data[0]['grade'])),
-                context);
+            if (!data[0]['statut']) {
+              alertDialogue(context,
+                  content: "Votre compte à été désactivé contacter un admin");
+              provider.Provider.of<AuthProvider>(context!, listen: false)
+                  .changeValConnexionIsLoading(false);
+            } else {
+              pushNewPageRemoveUntil(
+                  Home(
+                      user: Utilisateur(
+                          id: data[0]['id'].toString(),
+                          nom: data[0]['nom'],
+                          prenom: data[0]['prenom'],
+                          email: data[0]['email'],
+                          pseudo: data[0]['pseudo'],
+                          statut: data[0]['statut'],
+                          grade: data[0]['grade'])),
+                  context);
+            }
+          } else {
+            alertDialogue(context,
+                content:
+                    "Votre compte à été supprimer vous \nn'avez plus le droit à être ici");
+            provider.Provider.of<AuthProvider>(context!, listen: false)
+                .changeValConnexionIsLoading(false);
           }
         }
       }
@@ -135,6 +148,8 @@ class ServiceApi {
       pushNewPageRemoveUntil(const Login(), context);
       provider.Provider.of<AuthProvider>(context, listen: false)
           .changeValConnexionIsLoading(false);
+      provider.Provider.of<AuthProvider>(context, listen: false)
+          .changeHomeIndex(0);
     } on AuthException catch (e) {
       alertDialogue(context, content: e.message);
     } catch (e) {
@@ -147,33 +162,31 @@ class ServiceApi {
       Utilisateur? utilisateur,
       required String? emailAdmin}) async {
     try {
-      provider.Provider.of<AuthProvider>(context!, listen: false)
-          .initDataUtilisateur(email: emailAdmin);
-      Navigator.pop(context);
       await supabase.auth
           .signUp(email: utilisateur!.email, password: utilisateur.email!)
-          .whenComplete(() async {
-        alertDialogue(context,
-            content:
-                "Compte utilisateur crée avec succès,\nUn message de confirmation à été envoyer à l'email ${utilisateur.email}");
+          .then((v) async {
         await supabase.from("utilisateur").insert({
           "nom": utilisateur.nom,
           "prenom": utilisateur.prenom,
-          "email": utilisateur.email,
-          "statut": utilisateur.statut,
           "pseudo": utilisateur.pseudo,
-          "grade": utilisateur.grade
+          "statut": utilisateur.statut,
+          "email": utilisateur.email,
+          "grade": utilisateur.grade,
+          "uidi": v.user!.id,
+        }).whenComplete(() {
+          Navigator.pop(context!);
+          alertDialogue(context,
+              content:
+                  "Compte utilisateur crée avec succès,\nUn message de confirmation à été envoyer à l'email ${utilisateur.email}");
+          provider.Provider.of<AuthProvider>(context, listen: false)
+              .initDataUtilisateur(email: emailAdmin);
         });
       }).timeout(const Duration(seconds: 10), onTimeout: () {
-        throw TimeoutException("Time out");
+        throw TimeoutException("Connexion perdu, réessayer plus tard");
       });
     } on AuthException catch (e) {
-      provider.Provider.of<AuthProvider>(context!, listen: false)
-          .changeValConnexionIsLoading(false);
       alertDialogue(context, content: e.message);
     } on TimeoutException catch (e) {
-      provider.Provider.of<AuthProvider>(context!, listen: false)
-          .changeValConnexionIsLoading(false);
       alertDialogue(context, content: e.message);
     } catch (e) {
       alertDialogue(context, content: e.toString());
@@ -189,9 +202,10 @@ class ServiceApi {
   }
 
   changeStatutUser({int? id, bool? statut, required var context}) async {
-    return await supabase
-        .from('utilisateur')
-        .update({'statut': statut}).match({'id': id});
+    simpleDialogueCardSansTitle(
+        barrierDismissible: true, context: context, msg: "Patientez svp...");
+    return await supabase.from('utilisateur').update({'statut': statut}).match(
+        {'id': id}).then((value) => Navigator.pop(context));
   }
 
   contacterAdmin({required String? email, BuildContext? context}) async {
@@ -200,7 +214,7 @@ class ServiceApi {
             content: "Votre e-mail a été soumit avec succès! "));
   }
 
-  storeModelPrediction({required Credits credits, var contexte}) async {
+  storeModelPrediction({required CreditsModels credits, var contexte}) async {
     simpleDialogueCardSansTitle(
         barrierDismissible: true, context: contexte, msg: "Analyse en cours");
     try {
@@ -242,10 +256,84 @@ class ServiceApi {
     }
   }
 
+  updateModelPrediction(
+      {required CreditsModels credits,
+      var contexte,
+      required String? id}) async {
+    simpleDialogueCardSansTitle(
+        barrierDismissible: true, context: contexte, msg: "Analyse en cours");
+    try {
+      var data = await http.post(host.baseUrl(endpoint: "models/"), body: {
+        "interestRate": credits.interestRate,
+        "loanTerm": credits.loanTerm,
+        "age": credits.age,
+        "loanAmount": credits.loanAmount,
+        "sexe": credits.sexe,
+        "revenu": credits.revenu,
+        "loanNbr": credits.loanNbr,
+        "logement": credits.logement,
+        "npaCharge": credits.npaCharge,
+        "activiteSecondaire": credits.activiteSecondaire,
+      }).timeout(const Duration(seconds: 10), onTimeout: () {
+        throw TimeoutException("Time out");
+      });
+      if (data.statusCode == 200) {
+        Navigator.pop(contexte);
+        var response = await jsonDecode(data.body);
+        credits.predictioSet(response['prediction'][0].toString());
+        print(credits);
+        await supabase
+            .from("credit")
+            .update(credits.toMap())
+            .eq("id", id)
+            .then((value) {
+          Navigator.pop(contexte);
+          actionDialogue(
+            context: contexte,
+            child: DisplayPrediction(credits: credits),
+          );
+          provider.Provider.of<AuthProvider>(contexte, listen: false)
+              .initDataCredit();
+        });
+      }
+    } on TimeoutException catch (e) {
+      Navigator.pop(contexte);
+      alertDialogue(contexte, content: e.message);
+    } catch (e) {
+      Navigator.pop(contexte);
+      alertDialogue(contexte,
+          content: "$e C'est très domage le serveur distant ne reponds pas");
+    }
+  }
+
   getCreditList() async {
     return await supabase
         .from("credit")
         .select("*")
         .order('id', ascending: true);
+  }
+
+  deleteUser(
+      {required int id,
+      required var context,
+      required String emailAdmin}) async {
+    try {
+      simpleDialogueCardSansTitle(
+          barrierDismissible: true, context: context, msg: "Patientez spv! ");
+      await supabase.from("utilisateur").delete().eq("id", id).then((v) {
+        Navigator.pop(context);
+        alertDialogue(context, content: "Utilisateur supprimé");
+        provider.Provider.of<AuthProvider>(context, listen: false)
+            .initDataUtilisateur(email: emailAdmin);
+      }).timeout(const Duration(seconds: 10), onTimeout: () {
+        throw TimeoutException("Connexion perdu, réessayer plus tard");
+      });
+    } on AuthException catch (e) {
+      alertDialogue(context, content: e.message);
+    } on TimeoutException catch (e) {
+      alertDialogue(context, content: e.message);
+    } catch (e) {
+      alertDialogue(context, content: e.toString());
+    }
   }
 }

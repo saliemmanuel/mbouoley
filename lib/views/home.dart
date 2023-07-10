@@ -25,10 +25,10 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     final content = [
-      const DashBoard(),
+      DashBoard(user: widget.user),
       UsersViews(user: widget.user),
       Credits(user: widget.user),
-      const Settings(),
+      Settings(user: widget.user),
     ];
 
     var item = [
@@ -113,19 +113,67 @@ class _HomeState extends State<Home> {
                           child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                for (var element = 0;
-                                    element < item.length;
-                                    element++)
+                                HomeItem(
+                                  indexItem: 0,
+                                  icon: FluentIcons.home,
+                                  label: "Accueil",
+                                  isActive: Provider.of<AuthProvider>(context,
+                                              listen: false)
+                                          .topIndex ==
+                                      0,
+                                  onTap: () {
+                                    Provider.of<AuthProvider>(context,
+                                            listen: false)
+                                        .changeHomeIndex(0);
+                                    setState(() {});
+                                  },
+                                ),
+                                if (widget.user.grade == "admin")
                                   HomeItem(
-                                    indexItem: item[element].indexItem,
-                                    icon: item[element].icon,
-                                    label: item[element].label,
-                                    isActive: item[element].indexItem ==
-                                        Provider.of<AuthProvider>(context,
+                                    indexItem: 1,
+                                    icon: FluentIcons.reminder_group,
+                                    label: "Utilisateurs",
+                                    isActive: Provider.of<AuthProvider>(context,
                                                 listen: false)
-                                            .topIndex,
-                                    onTap: item[element].onTap,
-                                  )
+                                            .topIndex ==
+                                        1,
+                                    onTap: () {
+                                      Provider.of<AuthProvider>(context,
+                                              listen: false)
+                                          .changeHomeIndex(1);
+                                      setState(() {});
+                                    },
+                                  ),
+                                HomeItem(
+                                  indexItem: 2,
+                                  icon: FluentIcons.money,
+                                  label: "Crédits",
+                                  isActive: Provider.of<AuthProvider>(context,
+                                              listen: false)
+                                          .topIndex ==
+                                      2,
+                                  onTap: () {
+                                    Provider.of<AuthProvider>(context,
+                                            listen: false)
+                                        .changeHomeIndex(2);
+                                    setState(() {});
+                                  },
+                                ),
+                                HomeItem(
+                                  indexItem: 3,
+                                  icon: FluentIcons.settings,
+                                  label: "Paramètres",
+                                  isActive: Provider.of<AuthProvider>(context,
+                                              listen: false)
+                                          .topIndex ==
+                                      3,
+                                  onTap: () {
+                                    Provider.of<AuthProvider>(context,
+                                            listen: false)
+                                        .changeHomeIndex(3);
+                                    setState(() {});
+                                  },
+                                ),
                               ]),
                         ),
                       ),

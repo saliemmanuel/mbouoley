@@ -5,7 +5,7 @@ import 'package:flutter/material.dart' as material;
 import '../Models/credits.dart';
 
 class DisplayPrediction extends StatefulWidget {
-  final Credits credits;
+  final CreditsModels credits;
   const DisplayPrediction({super.key, required this.credits});
 
   @override
@@ -335,7 +335,6 @@ class _DisplayPredictionState extends State<DisplayPrediction> {
                 const SizedBox(width: 10.0),
               ],
             ),
-            const SizedBox(height: 15.0),
           ],
         ),
       ),

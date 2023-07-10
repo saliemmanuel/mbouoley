@@ -462,7 +462,7 @@ class _AddCreditState extends State<AddCredit> {
                                   "Vous n'avez pas repondu à la question :\nA une activité secondaire ?");
                         } else {
                           service.storeModelPrediction(
-                              credits: Credits(
+                              credits: CreditsModels(
                                 auteur: "${widget.user.nom}${widget.user.nom}",
                                 nomcompte: numcompte.text,
                                 codeagence: codeagence.text,

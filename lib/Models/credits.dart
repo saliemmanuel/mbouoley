@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-class Credits {
+class CreditsModels {
   final String interestRate;
   final String loanTerm;
   final String age;
@@ -25,7 +25,7 @@ class Credits {
   final String isEmployeeSahel;
   final String auteur;
   String prediction;
-  Credits({
+  CreditsModels({
     required this.interestRate,
     required this.loanTerm,
     required this.age,
@@ -56,7 +56,7 @@ class Credits {
     prediction = newPrediction;
   }
 
-  Credits copyWith({
+  CreditsModels copyWith({
     String? interestRate,
     String? loanTerm,
     String? age,
@@ -82,7 +82,7 @@ class Credits {
     String? auteur,
     String? prediction,
   }) {
-    return Credits(
+    return CreditsModels(
       interestRate: interestRate ?? this.interestRate,
       loanTerm: loanTerm ?? this.loanTerm,
       age: age ?? this.age,
@@ -139,8 +139,8 @@ class Credits {
     };
   }
 
-  factory Credits.fromMap(Map<String, dynamic> map) {
-    return Credits(
+  factory CreditsModels.fromMap(Map<String, dynamic> map) {
+    return CreditsModels(
       interestRate: map['interestRate'] ?? '',
       loanTerm: map['loanTerm'] ?? '',
       age: map['age'] ?? '',
@@ -170,19 +170,19 @@ class Credits {
 
   String toJson() => json.encode(toMap());
 
-  factory Credits.fromJson(String source) =>
-      Credits.fromMap(json.decode(source));
+  factory CreditsModels.fromJson(String source) =>
+      CreditsModels.fromMap(json.decode(source));
 
   @override
   String toString() {
-    return 'Credits(interestRate: $interestRate, loanTerm: $loanTerm, age: $age, lieu: $lieu, loanAmount: $loanAmount, sexe: $sexe, revenu: $revenu, taux: $taux, loanNbr: $loanNbr, logement: $logement, npaCharge: $npaCharge, activiteSecondaire: $activiteSecondaire, nomcompte: $nomcompte, codeagence: $codeagence, nomprenom: $nomprenom, niveauetude: $niveauetude, situationmatri: $situationmatri, typecredit: $typecredit, secteurprof: $secteurprof, catcredit: $catcredit, quotite: $quotite, isEmployeeSahel: $isEmployeeSahel, auteur: $auteur, prediction: $prediction)';
+    return 'CreditsModels(interestRate: $interestRate, loanTerm: $loanTerm, age: $age, lieu: $lieu, loanAmount: $loanAmount, sexe: $sexe, revenu: $revenu, taux: $taux, loanNbr: $loanNbr, logement: $logement, npaCharge: $npaCharge, activiteSecondaire: $activiteSecondaire, nomcompte: $nomcompte, codeagence: $codeagence, nomprenom: $nomprenom, niveauetude: $niveauetude, situationmatri: $situationmatri, typecredit: $typecredit, secteurprof: $secteurprof, catcredit: $catcredit, quotite: $quotite, isEmployeeSahel: $isEmployeeSahel, auteur: $auteur, prediction: $prediction)';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is Credits &&
+    return other is CreditsModels &&
         other.interestRate == interestRate &&
         other.loanTerm == loanTerm &&
         other.age == age &&
